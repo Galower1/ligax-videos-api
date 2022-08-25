@@ -17,15 +17,11 @@ app.use("/videos", express.static("videos"));
 app.get("/videos", (req, res, next) => {
   try {
     const videos = fs.readdirSync(VIDEOS_FOLDER);
-    const filePaths =
-      videos.length !== 1
-        ? videos.map((video, index) => ({
-            id: index,
-            video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
-          }))
-        : [];
-
-    res.json(filePaths);
+    const filePaths = videos.map((video, index) => ({
+      id: index,
+      video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
+    }));
+    res.json(filePaths.slice(1));
   } catch (err) {
     next(err);
   }
