@@ -25,7 +25,7 @@ app.get("/videos", (req, res, next) => {
         }
     );
 
-    res.json(filePaths);
+    res.json(filePaths || []);
   } catch (err) {
     next(err);
   }
