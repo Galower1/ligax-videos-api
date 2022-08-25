@@ -14,14 +14,20 @@ app.use(cors());
 app.use(fileUpload());
 app.use("/videos", express.static("videos"));
 
+function getFilePaths(req) {
+  const videos = fs.readdirSync(VIDEOS_FOLDER);
+  const filePaths = videos.map((video, index) => ({
+    id: index,
+    video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
+  }));
+  return filePaths.slice(1);
+}
+
 app.get("/videos", (req, res, next) => {
   try {
     const videos = fs.readdirSync(VIDEOS_FOLDER);
-    const filePaths = videos.map((video, index) => ({
-      id: index,
-      video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
-    }));
-    res.json(filePaths.slice(1));
+
+    res.json(getFilePaths(req));
   } catch (err) {
     next(err);
   }
@@ -32,14 +38,15 @@ app.post("/videos", (req, res, next) => {
     let sampleFile;
 
     if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded.");
+      return res.status(400).json({ message: "No files received" });
     }
 
     sampleFile = req.files.file;
 
     sampleFile.mv(path.join(VIDEOS_FOLDER, sampleFile.name), function (err) {
       if (err) return res.status(500).send(err);
-      res.json({ message: "Received file" });
+
+      res.json({ message: "Received file", currentVideos: getFilePaths(req) });
     });
   } catch (err) {
     next(err);
