@@ -23,7 +23,7 @@ app.get("/videos", (req, res, next) => {
             id: index,
             video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
           }))
-        : videos;
+        : [];
 
     res.json(filePaths);
   } catch (err) {
