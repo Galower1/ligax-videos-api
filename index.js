@@ -18,7 +18,7 @@ app.get("/videos", (req, res, next) => {
   try {
     const videos = fs.readdirSync(VIDEOS_FOLDER);
     const filePaths =
-      videos.length === 1
+      videos.length !== 1
         ? videos.map((video, index) => ({
             id: index,
             video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
