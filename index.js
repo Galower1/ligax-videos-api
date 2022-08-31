@@ -25,8 +25,6 @@ function getFilePaths(req) {
 
 app.get("/videos", (req, res, next) => {
   try {
-    const videos = fs.readdirSync(VIDEOS_FOLDER);
-
     res.json(getFilePaths(req));
   } catch (err) {
     next(err);
