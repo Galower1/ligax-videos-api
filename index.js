@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+const crypto = require("crypto");
 
 const PORT = process.env.PORT || 8000;
 const VIDEOS_FOLDER = "./videos";
@@ -14,18 +15,11 @@ app.use(cors());
 app.use(fileUpload());
 app.use("/videos", express.static("videos"));
 
-function getFilePaths(req) {
-  const videos = fs.readdirSync(VIDEOS_FOLDER);
-  const filePaths = videos.map((video, index) => ({
-    id: index,
-    video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${video}`,
-  }));
-  return filePaths.slice(1);
-}
+const videos = [];
 
 app.get("/videos", (req, res, next) => {
   try {
-    res.json(getFilePaths(req));
+    res.json(videos);
   } catch (err) {
     next(err);
   }
@@ -44,7 +38,12 @@ app.post("/videos", (req, res, next) => {
     sampleFile.mv(path.join(VIDEOS_FOLDER, sampleFile.name), function (err) {
       if (err) return res.status(500).send(err);
 
-      res.json({ message: "Received file", currentVideos: getFilePaths(req) });
+      videos.push({
+        id: crypto.randomUUID(),
+        video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${sampleFile.name}`,
+      });
+
+      res.json({ message: "Received file", currentVideos: videos });
     });
   } catch (err) {
     next(err);
