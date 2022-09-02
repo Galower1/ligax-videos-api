@@ -25,6 +25,24 @@ app.get("/videos", (req, res, next) => {
   }
 });
 
+app.delete("/videos/:videoId", (req, res, next) => {
+  try {
+    const { videoId } = req.params;
+
+    const index = videos.findIndex((value) => value.id === videoId);
+
+    const videoObject = videos[index];
+
+    videos.splice(index, 1);
+
+    fs.unlinkSync(`./videos/${videoObject.file_name}`);
+
+    res.status(204).json({ message: "Deleted file", file_name });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/videos", (req, res, next) => {
   try {
     let sampleFile;
@@ -40,6 +58,7 @@ app.post("/videos", (req, res, next) => {
 
       videos.push({
         id: crypto.randomUUID(),
+        file_name: sampleFile.name,
         video_url: `${req.protocol}://${req.rawHeaders[1]}/videos/${sampleFile.name}`,
       });
 
