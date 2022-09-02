@@ -37,7 +37,7 @@ app.delete("/videos/:videoId", (req, res, next) => {
 
     fs.unlinkSync(`./videos/${videoObject.file_name}`);
 
-    res.status(204).json({ message: "Deleted file", file_name });
+    res.status(204).json({ message: "Deleted file", videoObject.file_name });
   } catch (error) {
     next(error);
   }
